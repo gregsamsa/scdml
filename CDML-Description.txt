@@ -1,0 +1,333 @@
+Defines the elements of CDML
+
+1. List of tags
+
+<att>
+<attribute>
+<class>
+<code>
+<datatype>
+<diagram>
+<dia>
+<event>
+<evt>
+<final>
+<finalization>
+<impl>
+<implementation>
+<init>
+<initialization>
+<memb>
+<member>
+<meth>
+<methods>
+<param>
+<parameter>
+<prop>
+<property>
+<rel>
+<relationship>
+<setup>
+
+2. Tags descriptions
+
+<att> - Defines an attribute.
+
+	Attributes:
+	
+		id
+		name
+		type - Data type of the attribute. It can be a primitive type or the id of a class in the diagram.
+	
+<attribute> - The same as <att>.
+
+<binrelationship> - Defines a binary relationship between classes.
+
+	Attributes:
+	
+		id
+		name
+		
+<binrel> - The same as <binrelationship>.
+
+<class> - Defines a class.
+
+	Attributes:
+	
+		id
+		name
+		src - Filename which contains the class specification.
+		
+<code> - Code of a method or event.
+
+	Attributes:
+	
+		id
+		
+<datatype> - Data type definition.
+
+	Attributes:
+	
+		id
+		name
+		
+<diagram> - Diagram.
+
+	Attributes:
+		id
+		name
+
+<dia> - The same as <diagram>.
+
+<event>
+
+	Attributes:
+	
+		id
+		name
+		visibility - I think it makes no sense on an event...
+		
+<evt> -  The sema as <event>.
+
+<finalization> - Code to be executed at the end of a class definition.
+
+	Attributes:
+	
+		id
+			
+<final> - The same as <finalization>
+
+<implementation> - The code of a method or event.
+
+	Attributes:
+	
+		id
+		
+<impl> - The same as <implementation>
+
+<initialization> - Code to be executed at the beginning of a class definition, usually after the attributes initialization.
+
+	Attributes:
+	
+		id
+		
+<init> - The same as <initialization>.
+
+<member> - One of the members of a relationship.
+
+	Attributes:
+	
+		id
+		type - See types of relation...
+		role - The role the member plays in the relationship. It is usually the name of an attribute in the other member.
+		
+<memb> - The same as <member>.
+
+<method> - A method of a class.
+
+	Attributes:
+	
+		id
+		name
+		//visibility - Wont be implemented.
+		
+<meth> -  The same as <method>.
+
+<parameter> - Parameter of a method or event.
+
+	Attributes:
+	
+		id
+		name
+		type - Class or data type of the parameter.
+		
+<param> - The same as parameter.
+
+<property> - The same as <attribute>.
+
+<prop> - The same as <att>.
+
+<relationship> - A relationship.
+
+	Attributes:
+	
+		id
+		name
+		type
+		
+<rel> - The same as <relationship>.
+
+<setup> - Code to be executed to setup an attribute.
+
+	Attributes:
+	
+		id
+
+3. Element tree.
+
+<diagram>
+	<class>
+		<attribute>
+			<setup>
+	
+		<methods>
+			<parameter>
+			<implementation>
+	
+		<event>
+			<parameter>
+			<implementation>
+	
+		<initialization>
+		<finalization>
+	
+	<datatype>
+	
+	<relationship>
+		<member>
+		
+	<binrelationship
+		<member>
+
+4. DOM specification.
+
+Proviso: I won't encapsulate!
+
+Each tag correspond to an object. Such objects have the attributes the tags have and a few others described below.
+
+interface CDMLElement {
+	attribute String	id;
+	attribute String	name;  //not all elements have name
+	attribute String	tag;
+	
+	StringArray			generateCDML();  //each class should rewrite/override this
+	StringArray			generateCDMLJS();  //each class should rewrite/override this
+	
+	String				getOpeningTag();
+	String				getClosingTag();
+}
+
+interface CDMLCollection {
+	readonly attribute Integer		size;
+
+	void				insertElement(CDMLElement element);
+	CDMLElement			getElementById(String id);
+	void				removeElement(CDMLElement element);
+}
+
+interface CDMLCode : CDMLElement {  //will be used for setup, initialization, implementation and finalization
+	String 		lines(Integer i);
+	void		appendLine(String line);
+}
+
+interface CDMLDiagramElement : CDMLElement {
+	 attribute CDMLCollection	classes;
+	 attribute CDMLCollection	datatypes;
+	 attribute CDMLCollection	relationships;
+}
+
+interface CDMLClassElement : CDMLElement {
+	attribute String			src;
+	
+	attribute CDMLCollection	attributes;
+	attribute CDMLCollection	methods;
+	attribute CDMLCollection	events;
+}
+
+interface CDMLAttributeElement : CDMLElement {
+	attribute String			type;
+	attribute CDMLSetupElement	setup;
+}
+
+interface CDMLSetupElement : CDMLCode {
+
+}
+
+interface CDMLMethodsElement : CDMLElement {
+	attribute CDMLCollection		parameters;
+	attribute CDMLImplementation	implementation;
+}
+
+interface CDMLParameterElement : CDMLElement {
+	attribute String		type;
+}
+
+interface CDMLImplementationElement : CDMLCode {
+
+}
+
+interface CDMLEventElement : CDMLElement {
+	attribute CDMLCollection		parameters;
+	attribute CDMLImplementation	implementation;
+}
+
+interface CDMLDatatype : CDMLElement {
+
+}
+
+interface CDMLRelationshipElement : CDMLElement {
+	attribute CDMLColection		members;
+}
+
+interface CDMLRelationshipElement : CDMLElement {
+	attribute CDMLMember		member1;
+	attribute CDMLMember		member2;
+}
+
+interface CDMLMemberElement : CDMLElement {
+	attribute String		type;
+	attribute String		role;
+}
+
+
+4.1 The following procedures receive an object and extend it to implement an interface
+
+void extendToCDMLElement(Object o);
+
+void extendToCDMLCode(Object o);
+
+
+4.2 Method that creates a DOM tree from the CDML code
+
+CDMLDiagramElement createDiagramFromCDML(StringArray cdml);
+
+StringArrayArray getClassFromCDMLJS(StringArray cdmljs);
+
+CDMLDiagramElement createDiagramFromCDMLJSProject(StringArray cdmljsprjct, StringArrayArray cdmlsjclasses);
+
+CDMLClassElement createClassFromCDMLJS(StringArray cdmlsj);
+
+4.3 CDMLJS class file format
+
+A project written in CDMLJS has two file types: .prjct and .js. The .prjct file has a CDML code with
+empty <class> tag indicating id, name and src attributes pointing to .js files, as well as CDML code
+for datatypes and relationships. The .js files contain CDMLJS code, that is, javascript code with
+commented CDML code describing a class.
+
+The .js file containing CDMLJS code is a text file containing the following contiguous sections:
+
+i) initial comments: starts with a line containing only '/*', and ends with a line containing only '*/' followed
+by any number of empty lines;
+
+ii) class definition: starts wiht a line containing only '//<class ... >' followed by any number of empty lines,
+then followed by a line containing only a 'function ... {' followed by any number of attribute-defining sections
+and any number of empty lines, method-defining sections and any number of empty lines, and event-defining sections
+and any number of empty lines, then followed by a line containing '}', followed by any number of empty lines and
+finally a line containing only '//</class>' followed by any number of empty lines;
+
+iii) attribute-defining section: starts with a line containing only '//<attribute ...>' followed by any number of
+empty lines, followed by a line containing only '//<setup>', followed by javascript code, followed by a line containing only '//</setup>',
+followed by any number of empty lines, followed by a line containing only the string '//</attribute>';
+
+iv) method-defining section: starts with a line containing only '//<method ... >' followed by any number of empty lines,
+followed by any number of parameter-defining lines, which are lines of the form '//<parameter ... />', followed by any
+number of empty lines, followed by an implementation-defining section, followed by any number of empty lines, followed
+by a line containing only '//</method>';
+
+v) implementation-defining section: starts with a line containing only '//<implementation>' followed by javascript code, followed
+by a line containing only '//</implementation>';
+
+vi) event-defining section: starts with a line containing only '//<event ... >' followed by any number of empty lines,
+followed by any number of parameter-defining lines, which are lines of the form '//<parameter ... />', followed by any
+number of empty lines, followed by an implementation-defining section, followed by any number of empty lines, followed
+by a line containing only '//</event>';
