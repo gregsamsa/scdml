@@ -19,6 +19,16 @@ function createCDMLAttributeElement(id, name, type){
 		return openingTag;
 	};
 	
+	CDMLAttributeElement.getSelfClosingTag = function(){
+		var selfClosingTag = '<' + this.tag ;
+		if (this.id != null) selfClosingTag += ' id="' + this.id + '"';
+		if (this.name != null) selfClosingTag += ' name="' + this.name + '"';
+		if (this.type != null) selfClosingTag += ' type="' + this.type + '"';
+		selfClosingTag += ' />';
+		
+		return selfClosingTag;
+	}
+	
 	CDMLAttributeElement.generateCDMLJS = function(){
 		var cdml = new Array();
 		
