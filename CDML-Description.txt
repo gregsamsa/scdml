@@ -331,3 +331,9 @@ vi) event-defining section: starts with a line containing only '//<event ... >' 
 followed by any number of parameter-defining lines, which are lines of the form '//<parameter ... />', followed by any
 number of empty lines, followed by an implementation-defining section, followed by any number of empty lines, followed
 by a line containing only '//</event>';
+
+
+4.4 Relationship element
+
+The 'type' attribute of a 'member' element inside a relationship is should hold the id of some class or datatype.
+
